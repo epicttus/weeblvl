@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Rate your anime, manga, manhwa, visual novel and light novel knowledge and get your Otaku Level from 0 to 10.">
+<meta property="og:title" content="Otaku Level">
+<meta property="og:description" content="Rate your anime, manga, manhwa, visual novel and light novel knowledge and get your Otaku Level from 0 to 10.">
+<meta property="og:type" content="website">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F1F2F6">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0B0D14">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23DA2C4B'/%3E%3Ctext x='32' y='42' font-family='Arial Black,Arial,sans-serif' font-size='26' font-weight='900' fill='%23fff' text-anchor='middle'%3ELV%3C/text%3E%3C/svg%3E">
+<title>Otaku Level</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Martian+Mono:wght@400;500&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: rating sheet left, sticky status card right on desktop; status-first single column on phones. Manga screentone behind the level. */
+:root{
+  --bg:#F1F2F6;
+  --surface:#FFFFFF;
+  --surface-2:#F5F6F9;
+  --ink:#13141B;
+  --muted:#5B6073;
+  --line:#DADDE6;
+  --core:#DA2C4B;
+  --core-soft:rgba(218,44,75,.10);
+  --beyond:#3355D1;
+  --beyond-soft:rgba(51,85,209,.10);
+  --on-accent:#FFFFFF;
+  --scrim:rgba(13,15,24,.5);
+  --tone:rgba(19,20,27,.11);
+  --shadow:0 1px 2px rgba(19,20,40,.05),0 12px 32px -16px rgba(19,20,40,.24);
+  --f-display:"Dela Gothic One","Arial Black","Hiragino Sans",system-ui,sans-serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"Martian Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B0D14;--surface:#141723;--surface-2:#1A1E2C;--ink:#ECEEF6;--muted:#959BB0;--line:#272C3D;
+    --core:#FF5672;--core-soft:rgba(255,86,114,.14);--beyond:#7F96FF;--beyond-soft:rgba(127,150,255,.14);
+    --on-accent:#0B0D14;--tone:rgba(236,238,246,.085);--scrim:rgba(0,0,0,.62);
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 16px 40px -20px rgba(0,0,0,.75);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B0D14;--surface:#141723;--surface-2:#1A1E2C;--ink:#ECEEF6;--muted:#959BB0;--line:#272C3D;
+  --core:#FF5672;--core-soft:rgba(255,86,114,.14);--beyond:#7F96FF;--beyond-soft:rgba(127,150,255,.14);
+  --on-accent:#0B0D14;--tone:rgba(236,238,246,.085);--scrim:rgba(0,0,0,.62);
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 16px 40px -20px rgba(0,0,0,.75);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;padding-inline:16px;padding-block:24px 112px;-webkit-font-smoothing:antialiased}
+@media (min-width:900px){body{padding-inline:32px;padding-block:44px 64px}}
+.wrap{max-width:1120px;margin-inline:auto;display:grid;gap:32px}
+h1,h2,p{margin:0}
+:root{padding-top:env(safe-area-inset-top, 0px);padding-bottom:env(safe-area-inset-bottom, 0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none !important}
+button,input{font:inherit;color:inherit}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+.core{--acc:var(--core);--acc-soft:var(--core-soft)}
+.beyond{--acc:var(--beyond);--acc-soft:var(--beyond-soft)}
+
+/* Header */
+.top{display:grid;gap:14px;max-width:680px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.mark{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--core);color:var(--on-accent);font-family:var(--f-display);font-size:11px;letter-spacing:.02em}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(30px,5.6vw,48px);line-height:1.08;letter-spacing:-.01em;text-wrap:balance}
+.lede{color:var(--muted);font-size:16px;max-width:54ch}
+.lede strong{color:var(--ink);font-weight:700}
+
+/* Layout */
+.layout{display:grid;gap:24px;grid-template-areas:"status" "sheet"}
+.status{grid-area:status;min-width:0}
+.sheet{grid-area:sheet;min-width:0;display:grid;gap:24px;align-content:start}
+@media (min-width:900px){
+  .layout{grid-template-columns:minmax(0,1.22fr) minmax(0,.78fr);grid-template-areas:"sheet status";align-items:start;gap:32px}
+  .status{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 24px)}
+}
+
+/* Status card */
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+.head{position:relative;padding:22px 22px 18px;display:grid;gap:18px}
+.head::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle,var(--tone) 1.15px,transparent 1.6px);background-size:7px 7px;-webkit-mask-image:linear-gradient(160deg,#000 10%,transparent 72%);mask-image:linear-gradient(160deg,#000 10%,transparent 72%);pointer-events:none}
+.head > *{position:relative}
+.head .tate{position:absolute;top:20px;right:18px;writing-mode:vertical-rl;font-family:var(--f-display);font-size:13px;letter-spacing:.3em;color:var(--muted)}
+.lv-row{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;padding-right:34px}
+.lv{display:grid;line-height:1}
+.lv-tag{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;color:var(--core);text-transform:uppercase;margin-bottom:8px}
+.lv-num{font-family:var(--f-display);font-size:clamp(78px,22vw,108px);line-height:.86;letter-spacing:-.03em;display:inline-block;transform-origin:left bottom}
+.lv-num.bump{animation:bump .34s cubic-bezier(.2,.8,.2,1)}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.09)}100%{transform:scale(1)}}
+.lv-meta{display:grid;gap:4px;padding-bottom:4px;min-width:0;flex:1 1 140px}
+.chip{justify-self:start;font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:999px;border:1px dashed var(--muted);color:var(--muted);margin-bottom:4px}
+.lv-title{font-family:var(--f-display);font-size:24px;line-height:1.1;color:var(--core);text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
+.lv-blurb{color:var(--muted);font-size:14px}
+
+.pts{display:grid;gap:9px}
+.pts-line{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.pts-val{font-size:20px;font-weight:500}
+.pts-max{font-size:12px;color:var(--muted)}
+.pts-next{margin-left:auto;font-size:11px;color:var(--muted)}
+.bar{height:6px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--core),var(--beyond));border-radius:inherit;transition:width .35s cubic-bezier(.2,.8,.2,1)}
+.split{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--f-mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.split > span{display:inline-flex;align-items:center;gap:6px}
+.split b{color:var(--ink);font-weight:500}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot.core{background:var(--core)}
+.dot.beyond{background:var(--beyond)}
+
+.radar-wrap{padding:10px 14px 6px;border-top:1px solid var(--line);display:grid;place-items:center}
+#radar{width:100%;max-width:380px;height:auto;display:block}
+@media (min-width:900px){#radar{max-width:330px}}
+.ring{fill:none;stroke:var(--line);stroke-width:1}
+.ring.outer{stroke:var(--muted);stroke-opacity:.45}
+.axis{stroke:var(--line);stroke-width:1}
+.r-label{font-family:var(--f-body);font-size:12px;font-weight:500;fill:var(--muted)}
+.r-label.core{fill:var(--ink)}
+.shape{fill:url(#rgFill);stroke:url(#rgStroke);stroke-width:2.25;stroke-linejoin:round}
+.stop-core{stop-color:var(--core)}
+.stop-beyond{stop-color:var(--beyond)}
+.soft{stop-opacity:.24}
+.v-dot{stroke:var(--surface);stroke-width:2;transition:opacity .2s}
+.v-dot.core{fill:var(--core)}
+.v-dot.beyond{fill:var(--beyond)}
+
+.actions{display:grid;gap:12px;padding:16px 22px 22px;border-top:1px solid var(--line)}
+.field{display:grid;gap:6px}
+.field span{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.field input{width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);font-size:15px;outline:none;transition:border-color .15s,box-shadow .15s}
+.field input::placeholder{color:var(--muted);opacity:.8}
+.field input:focus-visible{border-color:var(--ink);box-shadow:0 0 0 3px var(--core-soft)}
+.preview{margin:0;padding:12px 14px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line);font-family:var(--f-mono);font-size:11.5px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--muted)}
+.btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.btn:disabled{opacity:.5;cursor:default;transform:none}
+.subrow{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted)}
+.link-btn{appearance:none;-webkit-appearance:none;background:none;border:0;padding:4px 0;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.link-btn:hover{color:var(--ink)}
+.link-btn.armed{color:var(--core)}
+.link-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:4px}
+.btn{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 16px;font-weight:700;font-size:14px;cursor:pointer;transition:transform .12s,background .15s,border-color .15s,color .15s;-webkit-tap-highlight-color:transparent}
+.btn:hover{border-color:var(--muted)}
+.btn:active{transform:translateY(1px)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.btn.primary{flex:1;background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.primary:hover{background:var(--core);border-color:var(--core);color:var(--on-accent)}
+.btn.armed{border-color:var(--core);color:var(--core)}
+.btn.small{padding:8px 12px;font-size:13px;flex:none}
+
+/* Rating sheet */
+.banner{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border-radius:16px;border:1px dashed var(--muted);background:var(--surface)}
+.banner p{font-size:14px;color:var(--muted);min-width:0;flex:1 1 220px}
+.banner strong{color:var(--ink)}
+
+.scale{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+@media (min-width:640px){.scale{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.scale > div{background:var(--surface);padding:12px 14px;display:grid;gap:3px;align-content:start}
+.scale b{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;font-weight:500}
+.scale b i{font-style:normal;color:var(--muted);margin-right:4px}
+.scale span{font-size:12.5px;color:var(--muted);line-height:1.45}
+
+.group{display:grid;gap:12px}
+.g-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-inline:2px}
+.g-head h2{font-family:var(--f-display);font-weight:400;font-size:20px;letter-spacing:.01em}
+.mult{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:999px;background:var(--acc-soft);color:var(--acc)}
+.g-sum{margin-left:auto;font-family:var(--f-mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.g-sum b{color:var(--acc);font-weight:500}
+
+.cats{display:grid;gap:10px}
+.cat{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:10px}
+.cat-top{display:flex;align-items:baseline;gap:10px}
+.cat-name{font-weight:700;font-size:16px}
+.cat-pts{margin-left:auto;font-family:var(--f-mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cat-pts b{color:var(--acc);font-weight:500}
+.cat-ex{font-size:13px;color:var(--muted);line-height:1.45}
+.seg{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border-radius:13px;background:var(--surface-2);border:1px solid var(--line)}
+.seg input{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
+.seg label{display:grid;justify-items:center;gap:1px;padding:8px 4px 7px;border-radius:10px;cursor:pointer;color:var(--muted);transition:background .15s,color .15s;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;min-width:0}
+.seg label:hover{color:var(--ink);background:var(--acc-soft)}
+.seg .n{font-family:var(--f-mono);font-size:13px;font-weight:500;line-height:1.2}
+.seg .l{font-size:11.5px;line-height:1.2;white-space:nowrap}
+.seg input:checked + label{background:var(--acc);color:var(--on-accent)}
+.seg input:focus-visible + label{outline:2px solid var(--ink);outline-offset:1px}
+
+/* Ladder */
+.ladder-sec{display:grid;gap:14px}
+.sec-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.sec-head h2{font-family:var(--f-display);font-weight:400;font-size:20px}
+.sec-head p{color:var(--muted);font-size:13px}
+.ladder{list-style:none;margin:0;padding:0;columns:1;column-gap:36px}
+@media (min-width:720px){.ladder{columns:2}}
+.ladder li{break-inside:avoid;display:flex;align-items:center;gap:14px;padding:11px 12px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;transition:background .2s}
+.ladder .ln{font-family:var(--f-mono);font-size:12px;color:var(--muted);width:24px;flex:none}
+.ladder .lt{font-weight:700;flex:1;min-width:0}
+.ladder .lr{font-family:var(--f-mono);font-size:11px;color:var(--muted);white-space:nowrap}
+.ladder li.on{background:var(--core-soft);border-radius:10px;border-bottom-color:transparent}
+.ladder li.on .ln,.ladder li.on .lt{color:var(--core)}
+
+.foot{display:grid;gap:6px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;max-width:72ch}
+.foot strong{color:var(--ink)}
+
+/* Floating bits */
+.minibar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom, 0px));z-index:20;display:flex;align-items:center;gap:12px;padding:10px 10px 10px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.mb-lv{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.1em;color:var(--core);text-transform:uppercase;display:flex;align-items:baseline;gap:6px}
+.mb-lv b{font-family:var(--f-display);font-weight:400;font-size:22px;letter-spacing:0;color:var(--ink);line-height:1}
+.mb-t{font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.mb-p{font-family:var(--f-mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+@media (min-width:900px){.minibar{display:none}}
+
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom, 0px));transform:translate(-50%,8px);z-index:50;max-width:calc(100% - 32px);padding:10px 16px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:13px;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+@media (min-width:900px){.toast{bottom:calc(28px + env(safe-area-inset-bottom, 0px))}}
+
+/* Profile card dialog */
+.modal{position:fixed;inset:0;z-index:40;display:flex;overflow-y:auto;padding-inline:16px;padding-block:calc(16px + env(safe-area-inset-top, 0px)) calc(16px + env(safe-area-inset-bottom, 0px));background:var(--scrim);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.m-panel{margin:auto;width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:18px;display:grid;gap:14px;animation:rise .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.m-head{display:flex;align-items:center;gap:10px}
+.m-head h2{font-family:var(--f-display);font-weight:400;font-size:18px;flex:1;min-width:0}
+.seg.mini{grid-template-columns:repeat(2,minmax(0,1fr));padding:3px;border-radius:11px}
+.seg.mini label{padding:6px 12px;border-radius:8px}
+.icon-btn{appearance:none;-webkit-appearance:none;flex:none;width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);display:grid;place-items:center;font-size:20px;line-height:1;cursor:pointer}
+.icon-btn:hover{color:var(--ink)}
+.icon-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.m-preview{position:relative;width:min(100%, calc(min(56vh, 560px) * .8));aspect-ratio:4 / 5;margin-inline:auto;border-radius:14px;overflow:hidden;background:var(--surface-2);border:1px solid var(--line)}
+.m-preview img{display:block;width:100%;height:100%;object-fit:cover}
+.m-busy{position:absolute;inset:0;display:grid;place-items:center;padding:16px;text-align:center;font-family:var(--f-mono);font-size:12px;color:var(--muted);background:var(--surface-2)}
+.m-actions{display:flex;flex-wrap:wrap;gap:10px}
+.m-actions .btn{flex:1 1 auto}
+.m-hint{font-size:12.5px;color:var(--muted);text-align:center;text-wrap:balance}
+
+@media (prefers-reduced-motion: reduce){
+  .lv-num.bump,.m-panel{animation:none}
+  .bar span,.toast,.btn,.seg label,.v-dot,.ladder li{transition:none}
+}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="mark">LV</span>Otaku Level</div>
+    <h1>How deep does your anime knowledge go?</h1>
+    <p class="lede">Rate yourself in seven categories. <strong>Anime is the core, so it counts double.</strong> Your level and a card for Discord update as you go.</p>
+  </header>
+
+  <main class="layout">
+    <section class="status" aria-label="Your level">
+      <article class="card" id="statusCard">
+        <div class="head">
+          <span class="tate" aria-hidden="true">オタク度</span>
+          <div class="lv-row">
+            <div class="lv"><span class="lv-tag">Level</span><span class="lv-num" id="lvNum">0</span></div>
+            <div class="lv-meta">
+              <span class="chip" id="exampleChip">Example</span>
+              <div class="lv-title" id="lvTitle">Outsider</div>
+              <div class="lv-blurb" id="lvBlurb"></div>
+            </div>
+          </div>
+          <div class="pts">
+            <div class="pts-line"><span class="pts-val" id="ptsVal">0</span><span class="pts-max">/ 30 pts</span><span class="pts-next" id="ptsNext"></span></div>
+            <div class="bar"><span id="barFill"></span></div>
+            <div class="split">
+              <span><i class="dot core"></i>Anime <b id="coreVal">0</b>/18</span>
+              <span><i class="dot beyond"></i>Beyond anime <b id="beyondVal">0</b>/12</span>
+            </div>
+          </div>
+        </div>
+        <div class="radar-wrap">
+          <svg id="radar" viewBox="-168 -122 336 232" role="img" aria-label="Radar chart of your ratings in all seven categories"></svg>
+        </div>
+        <div class="actions">
+          <label class="field" for="playerName"><span>Name on your card</span><input id="playerName" type="text" maxlength="32" placeholder="Optional" autocomplete="nickname"></label>
+          <pre class="preview" id="discordText" aria-label="Discord message preview"></pre>
+          <div class="btns">
+            <button class="btn primary" id="cardBtn" type="button">Save card image</button>
+            <button class="btn" id="copyBtn" type="button">Copy for Discord</button>
+          </div>
+          <div class="subrow">
+            <span>Saved in this browser</span>
+            <button class="link-btn" id="resetBtn" type="button">Reset ratings</button>
+          </div>
+        </div>
+      </article>
+      <p class="sr" id="live" aria-live="polite"></p>
+    </section>
+
+    <div class="sheet">
+      <div class="banner" id="exampleBanner">
+        <p><strong>These are example ratings.</strong> Tap any rating to start your own from zero.</p>
+        <button class="btn small" id="clearExample" type="button">Start from zero</button>
+      </div>
+
+      <div class="scale" aria-label="Rating scale">
+        <div><b><i>0</i>None</b><span>Hasn't touched it.</span></div>
+        <div><b><i>1</i>Basic</b><span>Knows the big titles, has seen or read a few.</span></div>
+        <div><b><i>2</i>Advanced</b><span>Has gone through a lot, knows past the popular stuff.</span></div>
+        <div><b><i>3</i>Expert</b><span>Deep cuts, knows the creators, recommends obscure picks.</span></div>
+      </div>
+
+      <section class="group core" aria-labelledby="g-core">
+        <div class="g-head"><h2 id="g-core">Anime</h2><span class="mult">Core · ×2</span><span class="g-sum"><b id="coreSum">0</b> / 18 pts</span></div>
+        <div class="cats" id="coreCats"></div>
+      </section>
+
+      <section class="group beyond" aria-labelledby="g-beyond">
+        <div class="g-head"><h2 id="g-beyond">Beyond anime</h2><span class="mult">×1</span><span class="g-sum"><b id="beyondSum">0</b> / 12 pts</span></div>
+        <div class="cats" id="beyondCats"></div>
+      </section>
+    </div>
+  </main>
+
+  <section class="ladder-sec" aria-labelledby="ladderTitle">
+    <div class="sec-head"><h2 id="ladderTitle">All levels</h2><p>Level = total points ÷ 3, rounded</p></div>
+    <ol class="ladder" id="ladder"></ol>
+  </section>
+
+  <footer class="foot">
+    <p><strong>How scoring works.</strong> Each category is rated 0 to 3. The three anime categories count double, so they're worth up to 18 points. The four categories beyond anime are worth up to 12. Your level is your total out of 30, divided by 3 and rounded.</p>
+  </footer>
+</div>
+
+<div class="minibar" id="minibar" hidden>
+  <span class="mb-lv">Lv <b id="mbNum">0</b></span>
+  <span class="mb-t" id="mbTitle">Outsider</span>
+  <span class="mb-p" id="mbPts">0/30</span>
+  <button class="btn small" id="mbJump" type="button">See card</button>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<div class="modal" id="cardModal" role="dialog" aria-modal="true" aria-labelledby="cardTitle" hidden>
+  <div class="m-panel">
+    <div class="m-head">
+      <h2 id="cardTitle">Profile card</h2>
+      <div class="seg mini core" role="radiogroup" aria-label="Card theme">
+        <input type="radio" name="cardTheme" id="ct-dark" value="dark"><label for="ct-dark"><span class="l">Dark</span></label>
+        <input type="radio" name="cardTheme" id="ct-light" value="light"><label for="ct-light"><span class="l">Light</span></label>
+      </div>
+      <button class="icon-btn" id="cardClose" type="button" aria-label="Close">×</button>
+    </div>
+    <label class="field" for="cardName"><span>Name on your card</span><input id="cardName" type="text" maxlength="32" placeholder="Optional" autocomplete="nickname"></label>
+    <div class="m-preview">
+      <img id="cardImg" alt="Your Otaku Level profile card" width="1080" height="1350">
+      <span class="m-busy" id="cardBusy">Drawing your card…</span>
+    </div>
+    <div class="m-actions">
+      <button class="btn primary" id="cardDownload" type="button">Download PNG</button>
+      <button class="btn" id="cardCopy" type="button">Copy image</button>
+      <button class="btn" id="cardShare" type="button" hidden>Share</button>
+    </div>
+    <p class="m-hint">If saving doesn't start, right-click or long-press the image and save it from there.</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  var CATS = [
+    {id:'newgen',  name:'New Gen',         short:'New Gen',  group:'core',   ex:'Demon Slayer, Jujutsu Kaisen, My Hero Academia, Attack on Titan, Chainsaw Man, Frieren'},
+    {id:'oldgen',  name:'Old Gen',         short:'Old Gen',  group:'core',   ex:'Naruto, Bleach, One Piece, Dragon Ball Z, Death Note, FMA: Brotherhood'},
+    {id:'classics',name:'Classics',        short:'Classics', group:'core',   ex:'Cowboy Bebop, Samurai Champloo, Evangelion, Studio Ghibli'},
+    {id:'manga',   name:'Manga',           short:'Manga',    group:'beyond', ex:'Reading past the anime, manga-only series, knowing the mangaka'},
+    {id:'manhwa',  name:'Manhwa / Manhua', short:'Manhwa',   group:'beyond', ex:'Solo Leveling, Tower of God, Tales of Demons and Gods'},
+    {id:'vn',      name:'Visual Novels',   short:'VN',       group:'beyond', ex:'Fate/stay night, Steins;Gate, Clannad'},
+    {id:'ln',      name:'Light Novels',    short:'LN',       group:'beyond', ex:'Re:Zero, Mushoku Tensei, Overlord, plus web novels'}
+  ];
+  var SCALE = ['None','Basic','Advanced','Expert'];
+  var LEVELS = [
+    ['Outsider',    "Hasn't started the journey yet."],
+    ['Newcomer',    'A few shows in and curious.'],
+    ['Casual',      'Knows what everyone is watching.'],
+    ['Regular',     'Has real watch history across eras.'],
+    ['Enjoyer',     'Anime is a proper hobby now.'],
+    ['Veteran',     'Knows the eras and some of the sources.'],
+    ['Otaku',       'Deep in anime and branching out.'],
+    ['Connoisseur', 'Knows the medium beyond the screen.'],
+    ['Archivist',   'Has covered nearly everything.'],
+    ['Sage',        'Very little left to discover.'],
+    ['???',         'Off the scale.']
+  ];
+  var EXAMPLE = {newgen:3, oldgen:2, classics:1, manga:2, manhwa:1, vn:0, ln:1};
+  var KEY = 'otaku-level-v1';
+  var reduce = false;
+  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch(e){}
+  function $(id){ return document.getElementById(id); }
+  function zeros(){ var o = {}; CATS.forEach(function(c){ o[c.id] = 0; }); return o; }
+  function mult(c){ return c.group === 'core' ? 2 : 1; }
+  function cleanName(s){ return String(s || '').replace(/[*_~`|\\]/g, '').trim().slice(0, 32); }
+
+  var state = zeros(), name = '', example = true;
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) {
+      var d = JSON.parse(raw);
+      if (d && typeof d === 'object') {
+        if (typeof d.name === 'string') name = cleanName(d.name);
+        if (d.r && typeof d.r === 'object') {
+          CATS.forEach(function(c){ var v = Math.round(Number(d.r[c.id])); state[c.id] = (v >= 0 && v <= 3) ? v : 0; });
+          example = false;
+        }
+      }
+    }
+  } catch(e){}
+  if (example) state = Object.assign({}, EXAMPLE);
+
+  function save(){
+    try { localStorage.setItem(KEY, JSON.stringify(example ? {name:name} : {r:state, name:name})); } catch(e){}
+  }
+
+  function score(){
+    var core = 0, beyond = 0;
+    CATS.forEach(function(c){ var v = state[c.id] || 0; if (c.group === 'core') core += v * 2; else beyond += v; });
+    var total = core + beyond;
+    return {core:core, beyond:beyond, total:total, lv:Math.min(10, Math.round(total / 3))};
+  }
+  function band(lv){ return [lv === 0 ? 0 : 3 * lv - 1, lv === 10 ? 30 : 3 * lv + 1]; }
+
+  /* Categories */
+  CATS.forEach(function(c){
+    var el = document.createElement('div');
+    el.className = 'cat ' + c.group;
+    var radios = SCALE.map(function(s, i){
+      return '<input type="radio" name="' + c.id + '" id="' + c.id + '-' + i + '" value="' + i + '">' +
+             '<label for="' + c.id + '-' + i + '"><span class="n">' + i + '</span><span class="l">' + s + '</span></label>';
+    }).join('');
+    el.innerHTML =
+      '<div class="cat-top"><div class="cat-name" id="h-' + c.id + '">' + c.name + '</div>' +
+      '<div class="cat-pts"><b id="p-' + c.id + '">0</b> / ' + (3 * mult(c)) + ' pts</div></div>' +
+      '<p class="cat-ex">' + c.ex + '</p>' +
+      '<div class="seg" role="radiogroup" aria-labelledby="h-' + c.id + '">' + radios + '</div>';
+    $(c.group === 'core' ? 'coreCats' : 'beyondCats').appendChild(el);
+  });
+  function syncRadios(){ CATS.forEach(function(c){ var r = $(c.id + '-' + state[c.id]); if (r) r.checked = true; }); }
+
+  /* Ladder */
+  var ladderItems = LEVELS.map(function(L, i){
+    var b = band(i), li = document.createElement('li');
+    li.innerHTML = '<span class="ln">' + (i < 10 ? '0' + i : i) + '</span><span class="lt">' + L[0] + '</span><span class="lr">' + b[0] + '–' + b[1] + ' pts</span>';
+    $('ladder').appendChild(li);
+    return li;
+  });
+
+  /* Radar */
+  var NS = 'http://www.w3.org/2000/svg', R = 90, N = CATS.length;
+  function P(i, r){ var a = -Math.PI / 2 + i * 2 * Math.PI / N; return [Math.cos(a) * r, Math.sin(a) * r]; }
+  function mk(tag, attrs, parent){ var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+  var svg = $('radar'), defs = mk('defs', {}, svg);
+  var gS = mk('linearGradient', {id:'rgStroke', gradientUnits:'userSpaceOnUse', x1:'70', y1:'-80', x2:'-70', y2:'80'}, defs);
+  mk('stop', {offset:'0', 'class':'stop-core'}, gS); mk('stop', {offset:'1', 'class':'stop-beyond'}, gS);
+  var gF = mk('linearGradient', {id:'rgFill', gradientUnits:'userSpaceOnUse', x1:'70', y1:'-80', x2:'-70', y2:'80'}, defs);
+  mk('stop', {offset:'0', 'class':'stop-core soft'}, gF); mk('stop', {offset:'1', 'class':'stop-beyond soft'}, gF);
+  for (var k = 1; k <= 3; k++) {
+    mk('polygon', {points:CATS.map(function(_, i){ return P(i, R * k / 3).map(function(n){ return n.toFixed(2); }).join(','); }).join(' '), 'class':'ring' + (k === 3 ? ' outer' : '')}, svg);
+  }
+  CATS.forEach(function(c, i){ var p = P(i, R); mk('line', {x1:0, y1:0, x2:p[0].toFixed(2), y2:p[1].toFixed(2), 'class':'axis'}, svg); });
+  CATS.forEach(function(c, i){
+    var p = P(i, R + 16);
+    var t = mk('text', {x:p[0].toFixed(1), y:p[1].toFixed(1), 'class':'r-label ' + c.group, 'text-anchor':Math.abs(p[0]) < 4 ? 'middle' : (p[0] > 0 ? 'start' : 'end'), 'dominant-baseline':'middle'}, svg);
+    t.textContent = c.short;
+  });
+  var shape = mk('polygon', {'class':'shape', points:'0,0'}, svg);
+  var dots = CATS.map(function(c){ return mk('circle', {r:'4', 'class':'v-dot ' + c.group, cx:'0', cy:'0'}, svg); });
+  var disp = CATS.map(function(){ return 0; }), anim = 0;
+
+  function drawShape(vals){
+    var pts = vals.map(function(v, i){ return P(i, R * v / 3); });
+    shape.setAttribute('points', pts.map(function(p){ return p[0].toFixed(2) + ',' + p[1].toFixed(2); }).join(' '));
+    dots.forEach(function(d, i){ d.setAttribute('cx', pts[i][0].toFixed(2)); d.setAttribute('cy', pts[i][1].toFixed(2)); d.style.opacity = vals[i] > 0.05 ? 1 : 0; });
+  }
+  function radarTo(target, tween){
+    cancelAnimationFrame(anim);
+    if (!tween || reduce) { disp = target.slice(); drawShape(disp); return; }
+    var from = disp.slice(), t0 = performance.now(), dur = 320;
+    function step(now){
+      var p = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      disp = from.map(function(f, i){ return f + (target[i] - f) * e; });
+      drawShape(disp);
+      if (p < 1) anim = requestAnimationFrame(step);
+    }
+    anim = requestAnimationFrame(step);
+  }
+
+  function discord(s){
+    var who = name ? name + ' · ' : '';
+    return '**' + who + 'Lvl ' + s.lv + ' · ' + LEVELS[s.lv][0] + '** (' + s.total + '/30 pts)\n' +
+      CATS.map(function(c){ return c.short + ' ' + state[c.id]; }).join(' | ');
+  }
+
+  var lastLv = null;
+  function render(radarMode){
+    var s = score(), L = LEVELS[s.lv];
+    $('lvNum').textContent = s.lv;
+    $('lvTitle').textContent = L[0];
+    $('lvBlurb').textContent = L[1];
+    if (lastLv !== null && lastLv !== s.lv && !reduce) {
+      var n = $('lvNum'); n.classList.remove('bump'); void n.offsetWidth; n.classList.add('bump');
+    }
+    lastLv = s.lv;
+
+    $('ptsVal').textContent = s.total;
+    var lo = band(s.lv)[0];
+    if (s.lv < 10) {
+      var next = 3 * s.lv + 2, need = next - s.total;
+      $('ptsNext').textContent = need + (need === 1 ? ' pt' : ' pts') + ' to Lv ' + (s.lv + 1);
+      $('barFill').style.width = ((s.total - lo) / (next - lo) * 100).toFixed(1) + '%';
+    } else {
+      $('ptsNext').textContent = 'Max level';
+      $('barFill').style.width = '100%';
+    }
+    $('coreVal').textContent = s.core; $('beyondVal').textContent = s.beyond;
+    $('coreSum').textContent = s.core; $('beyondSum').textContent = s.beyond;
+    CATS.forEach(function(c){ $('p-' + c.id).textContent = state[c.id] * mult(c); });
+
+    $('exampleChip').hidden = !example;
+    $('exampleBanner').hidden = !example;
+    $('discordText').textContent = discord(s);
+    ladderItems.forEach(function(li, i){ li.classList.toggle('on', i === s.lv); });
+    $('mbNum').textContent = s.lv; $('mbTitle').textContent = L[0]; $('mbPts').textContent = s.total + '/30';
+    $('live').textContent = 'Level ' + s.lv + ', ' + L[0] + ', ' + s.total + ' of 30 points';
+
+    if (radarMode !== 'skip') radarTo(CATS.map(function(c){ return state[c.id]; }), radarMode === 'tween');
+  }
+
+  /* Toast */
+  var toastT = 0, toastH = 0;
+  function toast(msg){
+    var t = $('toast');
+    t.textContent = msg; t.hidden = false;
+    clearTimeout(toastT); clearTimeout(toastH);
+    requestAnimationFrame(function(){ t.classList.add('show'); });
+    toastT = setTimeout(function(){ t.classList.remove('show'); toastH = setTimeout(function(){ t.hidden = true; }, 250); }, 2400);
+  }
+
+  /* Events */
+  document.addEventListener('change', function(e){
+    var t = e.target;
+    if (!t || t.type !== 'radio') return;
+    if (t.name === 'cardTheme') { setCardTheme(t.value); return; }
+    if (!CATS.some(function(c){ return c.id === t.name; })) return;
+    var v = Number(t.value);
+    if (example) {
+      example = false; state = zeros(); state[t.name] = v; syncRadios();
+      toast('Example cleared. Now rating you.');
+    } else {
+      state[t.name] = v;
+    }
+    render('tween'); save();
+  });
+
+  var nameIn = $('playerName');
+  nameIn.value = name;
+  nameIn.addEventListener('input', function(){ name = cleanName(nameIn.value); render('skip'); save(); });
+
+  $('clearExample').addEventListener('click', function(){
+    example = false; state = zeros(); syncRadios(); render('tween'); save();
+  });
+
+  var resetBtn = $('resetBtn'), armed = false, armT = 0;
+  function disarm(){ armed = false; clearTimeout(armT); resetBtn.textContent = 'Reset ratings'; resetBtn.classList.remove('armed'); }
+  resetBtn.addEventListener('click', function(){
+    if (!armed) { armed = true; resetBtn.textContent = 'Tap again to reset'; resetBtn.classList.add('armed'); armT = setTimeout(disarm, 3000); return; }
+    disarm(); example = false; state = zeros(); syncRadios(); render('tween'); save();
+    toast('Ratings reset to zero');
+  });
+
+  function selectPreview(){
+    try {
+      var r = document.createRange(); r.selectNodeContents($('discordText'));
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    } catch(e){}
+    toast('Text selected. Copy it to paste in Discord.');
+  }
+  $('copyBtn').addEventListener('click', function(){
+    var text = discord(score());
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function(){ toast('Copied. Paste it in Discord.'); }, selectPreview);
+        return;
+      }
+    } catch(e){}
+    selectPreview();
+  });
+
+  var mb = $('minibar'), card = $('statusCard');
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function(es){ mb.hidden = es[0].isIntersecting; }, {threshold:0.05}).observe(card);
+  }
+  $('mbJump').addEventListener('click', function(){ card.scrollIntoView({behavior:reduce ? 'auto' : 'smooth', block:'start'}); });
+
+  /* Profile card image */
+  var SITE_URL = ''; // Optional: your site address, printed on every card. Left empty, the page's own address is used.
+  var CW = 1080, CH = 1350;
+  var PAL = {
+    dark:  {bg:'#0B0D14', ink:'#ECEEF6', muted:'#959BB0', line:'#272C3D', track:'#1F2334', core:'#FF5672', beyond:'#7F96FF', onAccent:'#0B0D14', tone:'236,238,246', toneA:.10, glowA:.20},
+    light: {bg:'#F1F2F6', ink:'#13141B', muted:'#5B6073', line:'#D5D8E2', track:'#E0E3EC', core:'#DA2C4B', beyond:'#3355D1', onAccent:'#FFFFFF', tone:'19,20,27',    toneA:.12, glowA:.13}
+  };
+  var FD = '"Dela Gothic One","Arial Black",sans-serif';
+  var FB = '"Zen Kaku Gothic New","Segoe UI",system-ui,sans-serif';
+  var FM = '"Martian Mono",ui-monospace,Menlo,Consolas,monospace';
+
+  function hexA(hex, a){ var n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')'; }
+  function rr(ctx, x, y, w, h, r){ r = Math.min(r, w / 2, h / 2); ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+  function ls(ctx, px){ if ('letterSpacing' in ctx) ctx.letterSpacing = px + 'px'; }
+  function fit(ctx, text, weight, family, size, min, maxW){
+    var s = size; ctx.font = weight + ' ' + s + 'px ' + family;
+    while (s > min && ctx.measureText(text).width > maxW) { s -= 2; ctx.font = weight + ' ' + s + 'px ' + family; }
+    return s;
+  }
+  function siteLabel(){
+    if (SITE_URL) return SITE_URL.replace(/^https?:\/\//, '').replace(/\/$/, '');
+    try {
+      var h = location.hostname;
+      if (/^https?:$/.test(location.protocol) && h && !/claude|anthropic|usercontent|localhost|127\.0\.0\.1/.test(h)) {
+        return (h + location.pathname).replace(/\/(index\.html)?$/, '');
+      }
+    } catch(e){}
+    return 'Otaku Level';
+  }
+
+  function drawCard(theme){
+    var p = PAL[theme] || PAL.dark, s = score(), L = LEVELS[s.lv];
+    var cv = document.createElement('canvas'); cv.width = CW; cv.height = CH;
+    var ctx = cv.getContext('2d'), X0 = 72, X1 = CW - 72, i;
+
+    // Ground, corner glows, screentone
+    ctx.fillStyle = p.bg; ctx.fillRect(0, 0, CW, CH);
+    var g1 = ctx.createRadialGradient(CW, 0, 0, CW, 0, 780);
+    g1.addColorStop(0, hexA(p.core, p.glowA)); g1.addColorStop(1, hexA(p.core, 0));
+    ctx.fillStyle = g1; ctx.fillRect(0, 0, CW, CH);
+    var g2 = ctx.createRadialGradient(0, CH, 0, 0, CH, 860);
+    g2.addColorStop(0, hexA(p.beyond, p.glowA)); g2.addColorStop(1, hexA(p.beyond, 0));
+    ctx.fillStyle = g2; ctx.fillRect(0, 0, CW, CH);
+    for (var y = 12; y < 780; y += 14) {
+      for (var x = 12; x < CW; x += 14) {
+        var a = p.toneA * (1 - Math.hypot(x, y * 1.35) / 920);
+        if (a <= 0.004) continue;
+        ctx.fillStyle = 'rgba(' + p.tone + ',' + a.toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(x, y, 2.2, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+    ctx.strokeStyle = p.line; ctx.lineWidth = 2; rr(ctx, 24, 24, CW - 48, CH - 48, 40); ctx.stroke();
+
+    // Brand row
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = p.core; rr(ctx, X0, 72, 52, 52, 13); ctx.fill();
+    ctx.fillStyle = p.onAccent; ctx.font = '400 19px ' + FD; ctx.textAlign = 'center'; ls(ctx, 0); ctx.fillText('LV', X0 + 26, 99);
+    ctx.textAlign = 'left'; ctx.fillStyle = p.muted; ctx.font = '400 19px ' + FM; ls(ctx, 3); ctx.fillText('OTAKU LEVEL', X0 + 72, 99);
+    ctx.textAlign = 'center'; ls(ctx, 0); ctx.font = '400 26px ' + FD;
+    'オタク度'.split('').forEach(function(ch, k){ ctx.fillText(ch, X1 - 14, 96 + k * 36); });
+
+    // Name
+    ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = example ? p.core : p.muted; ctx.font = '400 18px ' + FM; ls(ctx, 3);
+    ctx.fillText(example ? 'EXAMPLE CARD' : 'PROFILE CARD', X0, 200);
+    if (name) { ls(ctx, 0); ctx.fillStyle = p.ink; fit(ctx, name, '400', FD, 60, 28, X1 - X0 - 90); ctx.fillText(name, X0, 266); }
+
+    // Level, title, blurb
+    ctx.fillStyle = p.core; ctx.font = '400 20px ' + FM; ls(ctx, 4); ctx.fillText('LEVEL', X0 + 4, 344);
+    ls(ctx, -4); ctx.fillStyle = p.ink; ctx.font = '400 250px ' + FD;
+    var num = String(s.lv), numW = ctx.measureText(num).width;
+    ctx.fillText(num, X0 - 6, 590);
+    var tx = X0 + numW + 36, tw = X1 - tx;
+    ls(ctx, 1); ctx.fillStyle = p.core;
+    var title = L[0].toUpperCase();
+    fit(ctx, title, '400', FD, 74, 30, tw); ctx.fillText(title, tx, 508);
+    ls(ctx, 0); ctx.fillStyle = p.muted;
+    fit(ctx, L[1], '500', FB, 30, 18, tw); ctx.fillText(L[1], tx, 566);
+
+    // Points and bar
+    ctx.fillStyle = p.ink; ctx.font = '500 46px ' + FM; ctx.fillText(String(s.total), X0, 688);
+    var tw2 = ctx.measureText(String(s.total)).width;
+    ctx.fillStyle = p.muted; ctx.font = '400 21px ' + FM; ls(ctx, 1); ctx.fillText('/ 30 PTS', X0 + tw2 + 14, 688);
+    var need = 3 * s.lv + 2 - s.total;
+    ctx.textAlign = 'right';
+    ctx.fillText(s.lv < 10 ? need + (need === 1 ? ' PT' : ' PTS') + ' TO LV ' + (s.lv + 1) : 'MAX LEVEL', X1, 688);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = p.track; rr(ctx, X0, 712, X1 - X0, 14, 7); ctx.fill();
+    if (s.total > 0) {
+      var gb = ctx.createLinearGradient(X0, 0, X1, 0); gb.addColorStop(0, p.core); gb.addColorStop(1, p.beyond);
+      ctx.fillStyle = gb; rr(ctx, X0, 712, Math.max(14, (X1 - X0) * s.total / 30), 14, 7); ctx.fill();
+    }
+    ctx.strokeStyle = p.line; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(X0, 772); ctx.lineTo(X1, 772); ctx.stroke();
+
+    // Radar
+    var cx = 292, cy = 1008, RR = 150;
+    function PP(k, r){ var an = -Math.PI / 2 + k * 2 * Math.PI / N; return [cx + Math.cos(an) * r, cy + Math.sin(an) * r]; }
+    function path(rs){ ctx.beginPath(); rs.forEach(function(r, k){ var q = PP(k, r); if (k) ctx.lineTo(q[0], q[1]); else ctx.moveTo(q[0], q[1]); }); ctx.closePath(); }
+    ctx.strokeStyle = p.line; ctx.lineWidth = 2;
+    for (i = 1; i <= 3; i++) { path(CATS.map(function(){ return RR * i / 3; })); ctx.stroke(); }
+    CATS.forEach(function(_, k){ var q = PP(k, RR); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(q[0], q[1]); ctx.stroke(); });
+    if (s.total > 0) {
+      var gp = ctx.createLinearGradient(cx + 110, cy - 130, cx - 110, cy + 130); gp.addColorStop(0, p.core); gp.addColorStop(1, p.beyond);
+      path(CATS.map(function(c){ return RR * state[c.id] / 3; }));
+      ctx.globalAlpha = .26; ctx.fillStyle = gp; ctx.fill(); ctx.globalAlpha = 1;
+      ctx.lineWidth = 4; ctx.lineJoin = 'round'; ctx.strokeStyle = gp; ctx.stroke();
+      CATS.forEach(function(c, k){
+        var v = state[c.id]; if (!v) return;
+        var q = PP(k, RR * v / 3);
+        ctx.beginPath(); ctx.arc(q[0], q[1], 8, 0, Math.PI * 2);
+        ctx.fillStyle = c.group === 'core' ? p.core : p.beyond; ctx.fill();
+        ctx.lineWidth = 4; ctx.strokeStyle = p.bg; ctx.stroke();
+      });
+    }
+    ctx.font = '500 24px ' + FB; ctx.textBaseline = 'middle'; ls(ctx, 0);
+    CATS.forEach(function(c, k){
+      var q = PP(k, RR + 26), dx = q[0] - cx;
+      ctx.textAlign = Math.abs(dx) < 4 ? 'center' : (dx > 0 ? 'left' : 'right');
+      ctx.fillStyle = c.group === 'core' ? p.ink : p.muted;
+      ctx.fillText(c.short, q[0], q[1]);
+    });
+
+    // Category list with pips
+    var lx = 612, pipW = 36, pipGap = 8, pipsX = X1 - (3 * pipW + 2 * pipGap);
+    function head(label, color, yy){ ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.font = '500 17px ' + FM; ls(ctx, 3); ctx.fillStyle = color; ctx.fillText(label, lx, yy); }
+    function row(c, yy){
+      var col = c.group === 'core' ? p.core : p.beyond, v = state[c.id];
+      ls(ctx, 0); ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillStyle = p.ink;
+      fit(ctx, c.name, '700', FB, 26, 16, pipsX - lx - 20); ctx.fillText(c.name, lx, yy);
+      for (var j = 0; j < 3; j++) { ctx.fillStyle = j < v ? col : p.track; rr(ctx, pipsX + j * (pipW + pipGap), yy - 7, pipW, 14, 7); ctx.fill(); }
+    }
+    head('ANIME ×2', p.core, 812);
+    var ry = 848;
+    CATS.forEach(function(c){ if (c.group === 'core') { row(c, ry); ry += 50; } });
+    head('BEYOND ANIME', p.beyond, ry + 20);
+    ry += 56;
+    CATS.forEach(function(c){ if (c.group !== 'core') { row(c, ry); ry += 50; } });
+
+    // Footer
+    ctx.strokeStyle = p.line; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(X0, 1252); ctx.lineTo(X1, 1252); ctx.stroke();
+    ctx.textBaseline = 'alphabetic'; ctx.textAlign = 'left'; ctx.font = '400 18px ' + FM; ls(ctx, 2); ctx.fillStyle = p.muted;
+    var left = 'ANIME ' + s.core + '/18 · BEYOND ' + s.beyond + '/12';
+    ctx.fillText(left, X0, 1292);
+    var lw = ctx.measureText(left).width, site = siteLabel();
+    ctx.textAlign = 'right'; ctx.fillStyle = p.ink;
+    fit(ctx, site, '500', FM, 18, 11, X1 - X0 - lw - 40); ctx.fillText(site, X1, 1292);
+    return cv;
+  }
+
+  var modal = $('cardModal'), cardImg = $('cardImg'), cardBusy = $('cardBusy'), cardNameIn = $('cardName');
+  var cardTheme = 'dark', cardUrl = '', cardBlob = null, cardTok = 0, lastFocus = null, cardNameT = 0, fontsP = null;
+  try { var ct = localStorage.getItem(KEY + '-card'); if (ct === 'light' || ct === 'dark') cardTheme = ct; } catch(e){}
+  $('cardCopy').hidden = !(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write);
+
+  function fontsReady(){
+    if (fontsP) return fontsP;
+    var loads = Promise.resolve();
+    if (document.fonts && document.fonts.load) {
+      loads = Promise.all([
+        document.fonts.load('400 100px "Dela Gothic One"', 'LV0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ?'),
+        document.fonts.load('400 40px "Dela Gothic One"', 'オタク度'),
+        document.fonts.load('500 24px "Zen Kaku Gothic New"'),
+        document.fonts.load('700 24px "Zen Kaku Gothic New"'),
+        document.fonts.load('400 24px "Martian Mono"'),
+        document.fonts.load('500 24px "Martian Mono"')
+      ]).catch(function(){});
+    }
+    fontsP = Promise.race([loads, new Promise(function(r){ setTimeout(r, 3000); })]);
+    return fontsP;
+  }
+  function setBusy(b){ cardBusy.hidden = !b; ['cardDownload', 'cardCopy', 'cardShare'].forEach(function(id){ $(id).disabled = b; }); }
+  function dataToBlob(u){ var bin = atob(u.split(',')[1]), arr = new Uint8Array(bin.length); for (var k = 0; k < bin.length; k++) arr[k] = bin.charCodeAt(k); return new Blob([arr], {type:'image/png'}); }
+  function fileName(){ var slug = (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); return 'otaku-level-' + (slug ? slug + '-' : '') + 'lv' + score().lv + '.png'; }
+  function cardFile(){ try { return cardBlob ? new File([cardBlob], fileName(), {type:'image/png'}) : null; } catch(e){ return null; } }
+  function updateShare(){ var f = cardFile(), ok = false; try { ok = !!(f && navigator.canShare && navigator.canShare({files:[f]})); } catch(e){} $('cardShare').hidden = !ok; }
+
+  function renderCard(){
+    var tok = ++cardTok;
+    cardBusy.textContent = 'Drawing your card…'; setBusy(true);
+    var extra = (name && document.fonts && document.fonts.load) ? document.fonts.load('400 60px "Dela Gothic One"', name).catch(function(){}) : null;
+    Promise.all([fontsReady(), extra]).then(function(){
+      if (tok !== cardTok) return;
+      try {
+        var cv = drawCard(cardTheme);
+        cardUrl = cv.toDataURL('image/png'); cardBlob = dataToBlob(cardUrl);
+        cardImg.src = cardUrl; updateShare(); setBusy(false);
+      } catch(e){ cardBusy.textContent = "This browser couldn't draw the card."; }
+    });
+  }
+  function setCardTheme(t){ cardTheme = t === 'light' ? 'light' : 'dark'; try { localStorage.setItem(KEY + '-card', cardTheme); } catch(e){} renderCard(); }
+  function openCard(){
+    lastFocus = document.activeElement;
+    cardNameIn.value = name;
+    var r = $('ct-' + cardTheme); if (r) r.checked = true;
+    modal.hidden = false; document.documentElement.style.overflow = 'hidden';
+    renderCard();
+    setTimeout(function(){ $('cardClose').focus(); }, 30);
+  }
+  function closeCard(){ modal.hidden = true; document.documentElement.style.overflow = ''; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+
+  $('cardBtn').addEventListener('click', openCard);
+  $('cardClose').addEventListener('click', closeCard);
+  modal.addEventListener('click', function(e){ if (e.target === modal) closeCard(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && !modal.hidden) closeCard(); });
+  modal.addEventListener('keydown', function(e){
+    if (e.key !== 'Tab') return;
+    var f = [].slice.call(modal.querySelectorAll('button:not([disabled]):not([hidden]), input[type="text"], input[type="radio"]:checked'));
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+  cardNameIn.addEventListener('input', function(){
+    name = cleanName(cardNameIn.value); nameIn.value = cardNameIn.value; render('skip'); save();
+    clearTimeout(cardNameT); cardNameT = setTimeout(renderCard, 250);
+  });
+
+  $('cardDownload').addEventListener('click', function(){
+    if (!cardUrl) return;
+    var href = cardUrl, blobUrl = '';
+    try { if (cardBlob && window.URL && URL.createObjectURL) { blobUrl = URL.createObjectURL(cardBlob); href = blobUrl; } } catch(e){}
+    var a = document.createElement('a'); a.href = href; a.download = fileName(); a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    if (blobUrl) setTimeout(function(){ URL.revokeObjectURL(blobUrl); }, 4000);
+  });
+  $('cardCopy').addEventListener('click', function(){
+    if (!cardBlob) return;
+    var fail = function(){ toast("Couldn't copy here. Right-click or long-press the image instead."); };
+    try { navigator.clipboard.write([new ClipboardItem({'image/png': cardBlob})]).then(function(){ toast('Image copied. Paste it in Discord.'); }, fail); }
+    catch(e){ fail(); }
+  });
+  $('cardShare').addEventListener('click', function(){
+    var f = cardFile(); if (!f) return;
+    navigator.share({files:[f], title:'My Otaku Level'}).catch(function(err){ if (!err || err.name !== 'AbortError') toast('Sharing failed. Try Download PNG.'); });
+  });
+
+  syncRadios();
+  render('set');
+})();
+</script>
+
+</body>
+</html>
